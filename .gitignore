@@ -1,0 +1,12 @@
+/build/
+/cmake-build-*/
+/models/
+*.safetensors
+__pycache__/
+*.pyc
+.venv/
+.cache/
+Testing/
+CTestTestfile.cmake
+*.user
+compile_commands.json

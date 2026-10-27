@@ -1,0 +1,4 @@
+numpy>=1.26
+# scripts/dump_reference_logits.py also needs:
+# torch
+# transformers

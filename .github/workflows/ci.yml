@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-release
+            cc: gcc
+            cxx: g++
+            build_type: Release
+            sanitizers: OFF
+          - name: clang-release
+            cc: clang
+            cxx: clang++
+            build_type: Release
+            sanitizers: OFF
+          - name: gcc-asan-ubsan
+            cc: gcc
+            cxx: g++
+            build_type: RelWithDebInfo
+            sanitizers: ON
+          - name: clang-asan-ubsan
+            cc: clang
+            cxx: clang++
+            build_type: RelWithDebInfo
+            sanitizers: ON
+    steps:
+      - uses: actions/checkout@v4
+      - name: packages
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential clang
+      - name: configure
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DGPT2_SANITIZERS=${{ matrix.sanitizers }}
+      - name: build
+        run: cmake --build build -j$(nproc)
+      - name: test
+        run: ctest --test-dir build --output-on-failure
